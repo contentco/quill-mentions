@@ -1,21 +1,31 @@
-# Quill Paste Handler
+# Quill Mentions
 
-Custom module for [Quill.js](https://github.com/quilljs/quill) to allow user to change url format, to set nested list items as quill format and to handle table format when copy and paste from their file system, ms word and google docs into the editor
-
-## Depedency
-[quilljs-table](https://github.com/dost/quilljs-table)
+Custom module for [Quill.js](https://github.com/quilljs/quill) to allow mentions
 
 ## Usage
 ### Webpack/ES6
 
 ```javascript
 var quill = new Quill('#quill-editor', {
-        //...
         modules:{
-            pasteHandler: true
-        },
-        theme: 'snow'
-    });
+            mentions: {
+                users: [{
+                        label: 'Aron',
+                        username: 'Aron Hunt'
+                    },
+                    {
+                        label: 'Bob',
+                        username: 'Bobby Johnson'
+                    },
+                    {
+                        label: 'Dennis',
+                        username: 'Dennis'
+                    }
+                ]
+            }
+          },
+          theme: 'snow'
+});
 ```
 
 ## Contributing
