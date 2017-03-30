@@ -163,6 +163,7 @@ var Mentions = exports.Mentions = function () {
         this.onClose = props.onClose;
         this.onOpen = props.onOpen;
         this.users = props.users;
+        if (!this.users) return;
         this.container = this.quill.container.parentNode.querySelector(props.container);
         this.container = document.createElement("ul");
         this.container.classList.add('completions');
