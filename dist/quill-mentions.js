@@ -202,7 +202,7 @@ var Mentions = exports.Mentions = function () {
 
             this.atIndex = range.index;
             this.container.style.left = atSignBounds.left + "px";
-            this.container.style.top = atSignBounds.top + atSignBounds.height + "px", this.open = true;
+            this.container.style.top = atSignBounds.top + atSignBounds.height + "px", this.container.style.zIndex = 99, this.open = true;
 
             this.quill.on('text-change', this.onTextChange);
             this.quill.once('selection-change', this.onSelectionChange);

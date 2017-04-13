@@ -1,0 +1,23 @@
+{
+  "name": "quill-mentions",
+  "description": "Quill Extension for mentions",
+  "main": "webpack.config.js",
+  "authors": [
+    "contentco"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "content",
+    "mentions",
+    "quill",
+    "editor"
+  ],
+  "homepage": "https://github.com/contentco/quill-mentions",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
