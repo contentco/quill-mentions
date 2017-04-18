@@ -122,10 +122,10 @@ export class Mentions {
         const buttons = Array(users.length);
         this.buttons = buttons;
         const handler = (i, user) => event => {
-            if (event.key === "ArrowDown" || event.keyCode === 40) {
+            if (event.key === "ArrowRight" || event.keyCode === 39) {
                 event.preventDefault();
                 buttons[Math.min(buttons.length - 1, i + 1)].focus();
-            } else if (event.key === "ArrowUp" || event.keyCode === 38) {
+            } else if (event.key === "ArrowLeft" || event.keyCode === 37) {
                 event.preventDefault();
                 buttons[Math.max(0, i - 1)].focus();
             } else if (event.key === "Enter" || event.keyCode === 13

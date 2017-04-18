@@ -249,10 +249,10 @@ var Mentions = exports.Mentions = function () {
             this.buttons = buttons;
             var handler = function handler(i, user) {
                 return function (event) {
-                    if (event.key === "ArrowDown" || event.keyCode === 40) {
+                    if (event.key === "ArrowRight" || event.keyCode === 39) {
                         event.preventDefault();
                         buttons[Math.min(buttons.length - 1, i + 1)].focus();
-                    } else if (event.key === "ArrowUp" || event.keyCode === 38) {
+                    } else if (event.key === "ArrowLeft" || event.keyCode === 37) {
                         event.preventDefault();
                         buttons[Math.max(0, i - 1)].focus();
                     } else if (event.key === "Enter" || event.keyCode === 13 || event.key === " " || event.keyCode === 32 || event.key === "Tab" || event.keyCode === 9) {
