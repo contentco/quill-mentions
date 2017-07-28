@@ -82,11 +82,18 @@ export class Mentions {
         this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
         const atSignBounds = this.quill.getBounds(range.index);
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+
+
         
         this.atIndex = range.index;
         this.container.style.left = atSignBounds.left + "px";
-        this.container.style.top = atSignBounds.top + atSignBounds.height + "px",
-        this.container.style.zIndex = 99,
+        this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
+        let windowHeight = window.innerHeight;
+        let editorPos = this.quill.container.getBoundingClientRect().top;
+        if (editorPos > windowHeight/2 && this.container.offsetHeight > 0) {
+            this.container.style.top = '-' + this.container.offsetHeight + "px";
+        }
+        this.container.style.zIndex = 99;
         this.open = true;
 
         this.quill.on('text-change', this.onTextChange);

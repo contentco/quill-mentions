@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -202,7 +202,15 @@ var Mentions = exports.Mentions = function () {
 
             this.atIndex = range.index;
             this.container.style.left = atSignBounds.left + "px";
-            this.container.style.top = atSignBounds.top + atSignBounds.height + "px", this.container.style.zIndex = 99, this.open = true;
+            this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
+            var windowHeight = window.innerHeight;
+            console.log(windowHeight);
+            var editorPos = this.quill.container.getBoundingClientRect().top;
+            if (editorPos > windowHeight / 2 && this.container.offsetHeight > 0) {
+                this.container.style.top = '-' + this.container.offsetHeight + "px";
+            }
+            this.container.style.zIndex = 99;
+            this.open = true;
 
             this.quill.on('text-change', this.onTextChange);
             this.quill.once('selection-change', this.onSelectionChange);
