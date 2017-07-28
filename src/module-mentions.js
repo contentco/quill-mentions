@@ -10,7 +10,7 @@ const h = (tag, attrs, ...children) => {
 };
 
 const Inline = Quill.import('blots/inline');
-class MentionBlot extends Inline {
+export class MentionBlot extends Inline {
         static create(label) {
             const node = super.create();
             node.dataset.label = label;
@@ -42,7 +42,7 @@ Quill.register({
     'formats/mention': MentionBlot
 });
 
-export class Mentions {
+class Mentions {
     constructor(quill, props) {
         this.quill = quill;
         this.onClose = props.onClose;
@@ -72,6 +72,12 @@ export class Mentions {
             collapsed: true,
             format: ["mention"]
         }, this.handleArrow.bind(this));
+
+        quill.keyboard.addBinding({
+            key: 38,
+            collapsed: true,
+            format: ["mention"]
+        }, this.handleArrow.bind(this));
     }
 
     onAtKey(range, context) {
@@ -80,18 +86,18 @@ export class Mentions {
             this.quill.deleteText(range.index, range.length, Quill.sources.USER);
         }
         this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
-        const atSignBounds = this.quill.getBounds(range.index);
+        let atSignBounds = this.quill.getBounds(range.index);
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-
-
         
         this.atIndex = range.index;
         this.container.style.left = atSignBounds.left + "px";
         this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
         let windowHeight = window.innerHeight;
         let editorPos = this.quill.container.getBoundingClientRect().top;
-        if (editorPos > windowHeight/2 && this.container.offsetHeight > 0) {
-            this.container.style.top = '-' + this.container.offsetHeight + "px";
+
+        if (editorPos > windowHeight/2) {
+            let top = atSignBounds.top - 78;
+            this.container.style.top = top + "px";
         }
         this.container.style.zIndex = 99;
         this.open = true;
@@ -148,6 +154,7 @@ export class Mentions {
                            h('span', {className: "matched"}, "@" + this.query),
                            h('span', {className: "unmatched"}, user.username.slice(this.query.length))));
             this.container.appendChild(li);
+
             buttons[i] = li.firstChild;
             buttons[i].addEventListener('keydown', handler(i, user));
             buttons[i].addEventListener("mousedown", () => this.close(user));

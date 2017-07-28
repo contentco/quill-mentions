@@ -7,33 +7,47 @@
         <link rel="stylesheet" type="text/css" href="../dist/quill-mentions.css">
     </head>
     <body>
-        <div class="container" style="position:relative;">
+        <div class="container" style="position:relative;width:300px;float:right;">
+            <div style="height:800px;width:100%;background:#efefef;"></div>
             <div id="quill-editor"></div>
-            <div id="preview"></div>
         </div>
         <script src="../node_modules/quill/dist/quill.js"></script>
         <script src="../dist/quill-mentions.js"></script>
+        <!--<script src="../src/module-mentions.js"></script>-->
         <script type="text/javascript">
             var quill = new Quill('#quill-editor', {
-        modules:{
-            mentions: {
-                users: [{
-                        label: 'Aron',
-                        username: 'Aron Hunt'
-                    },
-                    {
-                        label: 'Bob',
-                        username: 'Bobby Johnson'
-                    },
-                    {
-                        label: 'Dennis',
-                        username: 'Dennis'
+                modules:{
+                    toolbar: false,
+                    mentions: {
+                        users: [{
+                                label: 'Aron',
+                                username: 'Aron Hunt'
+                            },
+                            {
+                                label: 'Bob',
+                                username: 'Bobby Johnson'
+                            },
+                            {
+                                label: 'Dennis',
+                                username: 'Dennis'
+                            },
+                            {
+                                label: 'Jef',
+                                username: 'Jef'
+                            },
+                            {
+                                label: 'Mark',
+                                username: 'Mark'
+                            },
+                            {
+                                label: 'Christrano Ronaldo',
+                                username: 'Christrano Ronaldo'
+                            }
+                        ]
                     }
-                ]
-            }
-          },
-          theme: 'snow'
-});
+                  },
+                  theme: 'snow'
+        });
             
         </script>
     </body>
