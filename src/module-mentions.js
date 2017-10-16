@@ -88,7 +88,7 @@ class Mentions {
         this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
         let atSignBounds = this.quill.getBounds(range.index);
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-        
+
         this.atIndex = range.index;
         this.container.style.left = atSignBounds.left + "px";
         this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
@@ -115,7 +115,7 @@ class Mentions {
 
     update() {
         const sel = this.quill.getSelection().index;
-        if (this.atIndex >= sel) { 
+        if (this.atIndex >= sel) {
             return this.close(null);
         }
         this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
@@ -152,7 +152,10 @@ class Mentions {
             const li = h('li', {},
                          h('button', {type: "button"},
                            h('span', {className: "matched"}, "@" + this.query),
-                           h('span', {className: "unmatched"}, user.username.slice(this.query.length))));
+                           h('span', {className: "unmatched"}, user.username.slice(this.query.length)),
+                           h('span', {className: "mention--name"}, user.name)
+                         )
+                         );
             this.container.appendChild(li);
 
             buttons[i] = li.firstChild;
