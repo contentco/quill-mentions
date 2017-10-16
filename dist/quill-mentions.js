@@ -208,17 +208,19 @@ var Mentions = function () {
 
             this.atIndex = range.index;
             this.container.style.left = atSignBounds.left + "px";
-            this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
             var windowHeight = window.innerHeight;
             var editorPos = this.quill.container.getBoundingClientRect().top;
 
             if (editorPos > windowHeight / 2) {
-                var top = atSignBounds.top - 78;
-                this.container.style.top = top + "px";
+                this.container.style.top = 'auto';
+                this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
+            } else {
+                this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
+                this.container.style.bottom = 'auto';
             }
+
             this.container.style.zIndex = 99;
             this.open = true;
-
             this.quill.on('text-change', this.onTextChange);
             this.quill.once('selection-change', this.onSelectionChange);
             this.update();
@@ -277,7 +279,7 @@ var Mentions = function () {
                 };
             };
             users.forEach(function (user, i) {
-                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "matched" }, "@" + _this3.query), h('span', { className: "unmatched" }, user.username.slice(_this3.query.length)), h('span', { className: "mention--name" }, user.name)));
+                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "matched" }, _this3.query), h('span', { className: "unmatched" }, user.username.slice(_this3.query.length)), h('span', { className: "mention--name" }, user.firstName + ' ' + user.lastName)));
                 _this3.container.appendChild(li);
 
                 buttons[i] = li.firstChild;

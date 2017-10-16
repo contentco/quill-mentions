@@ -88,20 +88,22 @@ class Mentions {
         this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
         let atSignBounds = this.quill.getBounds(range.index);
         this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-
+		
         this.atIndex = range.index;
         this.container.style.left = atSignBounds.left + "px";
-        this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
         let windowHeight = window.innerHeight;
         let editorPos = this.quill.container.getBoundingClientRect().top;
 
-        if (editorPos > windowHeight/2) {
-            let top = atSignBounds.top - 78;
-            this.container.style.top = top + "px";
+        if (editorPos > windowHeight / 2) {
+           	this.container.style.top = 'auto';
+           	this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
+        } else {
+        	this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
+        	this.container.style.bottom = 'auto';
         }
+       
         this.container.style.zIndex = 99;
         this.open = true;
-
         this.quill.on('text-change', this.onTextChange);
         this.quill.once('selection-change', this.onSelectionChange);
         this.update();
@@ -151,9 +153,9 @@ class Mentions {
         users.forEach((user, i) => {
             const li = h('li', {},
                          h('button', {type: "button"},
-                           h('span', {className: "matched"}, "@" + this.query),
+                           h('span', {className: "matched"}, this.query),
                            h('span', {className: "unmatched"}, user.username.slice(this.query.length)),
-                           h('span', {className: "mention--name"}, user.name)
+                           h('span', { className: "mention--name" }, user.firstName +' '+ user.lastName)
                          )
                          );
             this.container.appendChild(li);
