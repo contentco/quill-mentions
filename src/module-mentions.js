@@ -122,7 +122,13 @@ class Mentions {
         }
         this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
         const users = this.users
-              .filter(u => u.username.startsWith(this.query))
+              .filter(u => {
+              	if (u.username.startsWith(this.query)) {
+              		return u.username.startsWith(this.query)	
+              	} else {
+              		return u.fullName.startsWith(this.query)
+              	}
+              })
               .sort((u1, u2) => u1.username > u2.username);
         this.renderCompletions(users);
     }
@@ -151,13 +157,15 @@ class Mentions {
             }
         };
         users.forEach((user, i) => {
-            const li = h('li', {},
-                         h('button', {type: "button"},
-                           h('span', {className: "matched"}, this.query),
-                           h('span', {className: "unmatched"}, user.username.slice(this.query.length)),
-                           h('span', { className: "mention--name" }, user.firstName +' '+ user.lastName)
-                         )
-                         );
+        	
+    		const li = h('li', {},
+                     h('button', {type: "button"},
+                       h('span', {className: "mention--username"}, user.username),
+                       h('span', { className: "mention--name" }, user.fullName)
+                     )
+                     );
+        	
+            
             this.container.appendChild(li);
 
             buttons[i] = li.firstChild;

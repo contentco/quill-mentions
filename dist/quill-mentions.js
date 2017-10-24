@@ -243,7 +243,11 @@ var Mentions = function () {
             }
             this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
             var users = this.users.filter(function (u) {
-                return u.username.startsWith(_this2.query);
+                if (u.username.startsWith(_this2.query)) {
+                    return u.username.startsWith(_this2.query);
+                } else {
+                    return u.fullName.startsWith(_this2.query);
+                }
             }).sort(function (u1, u2) {
                 return u1.username > u2.username;
             });
@@ -279,7 +283,9 @@ var Mentions = function () {
                 };
             };
             users.forEach(function (user, i) {
-                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "matched" }, _this3.query), h('span', { className: "unmatched" }, user.username.slice(_this3.query.length)), h('span', { className: "mention--name" }, user.firstName + ' ' + user.lastName)));
+
+                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "mention--username" }, user.username), h('span', { className: "mention--name" }, user.fullName)));
+
                 _this3.container.appendChild(li);
 
                 buttons[i] = li.firstChild;

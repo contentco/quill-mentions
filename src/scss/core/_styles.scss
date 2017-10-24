@@ -9,38 +9,56 @@
     background: $white;
     border-radius: 2px;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+    max-height: 200px;
+    overflow: auto;
+    border: 1px solid $gray-20;
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 8px 20px -2px rgba(0,0,0,.25);
 }
 .completions > li {
     margin: 0;
     padding: 0;
-    display:inline-block;
+    border-bottom: 1px solid $gray-5;
+    display: block;
 }
 .completions > li > button {
     box-sizing: border-box;
-    height: 2em;
-    padding: .25em .5em;
     margin: 0;
     display: block;
     width: 100%;
     text-align: left;
     border: none;
     background: none;
+    cursor: pointer;
+    padding: 8px 12px;
 }
 .completions > li > button:hover {
-    background: $light-gray;
+    background: $blue;
+    span {
+      color: $white;
+    }
 }
 .completions > li > button:focus {
-    background: $light-gray;
+    background: $blue;
+    span {
+      color: $white;
+    }
     outline: none;
 }
+.completions > li > button > .mention--username {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.completions > li > button > .mention--name {
+    color: $gray-80;
+    margin-left: 4px;
+}
+
 .completions > li > button > .matched {
     font-weight: bold;
     color: black;
 }
 .completions > li > button > * {
     vertical-align: "middle";
-}
-
-.mention--name{
-  margin-left: 4px;
 }
