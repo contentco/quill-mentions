@@ -123,11 +123,12 @@ class Mentions {
         this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
         const users = this.users
               .filter(u => {
-              	if (u.username.startsWith(this.query)) {
-              		return u.username.startsWith(this.query)	
-              	} else {
-              		return u.fullName.startsWith(this.query)
-              	}
+              	const searchPattern = new RegExp('^' + this.query, 'gi');
+				if (searchPattern.test(u.username)){
+					return u.username;
+				} else if (searchPattern.test(u.fullName)) {
+					return u.fullName;
+				}
               })
               .sort((u1, u2) => u1.username > u2.username);
         this.renderCompletions(users);

@@ -243,10 +243,11 @@ var Mentions = function () {
             }
             this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
             var users = this.users.filter(function (u) {
-                if (u.username.startsWith(_this2.query)) {
-                    return u.username.startsWith(_this2.query);
-                } else {
-                    return u.fullName.startsWith(_this2.query);
+                var searchPattern = new RegExp('^' + _this2.query, 'gi');
+                if (searchPattern.test(u.username)) {
+                    return u.username;
+                } else if (searchPattern.test(u.fullName)) {
+                    return u.fullName;
                 }
             }).sort(function (u1, u2) {
                 return u1.username > u2.username;
