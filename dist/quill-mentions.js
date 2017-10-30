@@ -204,17 +204,19 @@ var Mentions = function () {
 
             this.atIndex = range.index;
             this.container.style.left = atSignBounds.left + "px";
-            this.container.style.top = atSignBounds.top + atSignBounds.height + "px";
             var windowHeight = window.innerHeight;
             var editorPos = this.quill.container.getBoundingClientRect().top;
 
             if (editorPos > windowHeight / 2) {
-                var top = atSignBounds.top - 78;
-                this.container.style.top = top + "px";
+                this.container.style.top = 'auto';
+                this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
+            } else {
+                this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
+                this.container.style.bottom = 'auto';
             }
+
             this.container.style.zIndex = 99;
             this.open = true;
-
             this.quill.on('text-change', this.onTextChange);
             this.quill.once('selection-change', this.onSelectionChange);
             this.update();
@@ -265,10 +267,10 @@ var Mentions = function () {
             this.buttons = buttons;
             var handler = function handler(i, user) {
                 return function (event) {
-                    if (event.key === "ArrowRight" || event.keyCode === 39) {
+                    if (event.key === "ArrowDown" || event.keyCode === 40) {
                         event.preventDefault();
                         buttons[Math.min(buttons.length - 1, i + 1)].focus();
-                    } else if (event.key === "ArrowLeft" || event.keyCode === 37) {
+                    } else if (event.key === "ArrowUp" || event.keyCode === 38) {
                         event.preventDefault();
                         buttons[Math.max(0, i - 1)].focus();
                     } else if (event.key === "Enter" || event.keyCode === 13 || event.key === " " || event.keyCode === 32 || event.key === "Tab" || event.keyCode === 9) {
