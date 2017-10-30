@@ -73,10 +73,6 @@
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -105,7 +101,7 @@ var h = function h(tag, attrs) {
 
 var Inline = Quill.import('blots/inline');
 
-var MentionBlot = exports.MentionBlot = function (_Inline) {
+var MentionBlot = function (_Inline) {
     _inherits(MentionBlot, _Inline);
 
     function MentionBlot() {
@@ -241,7 +237,12 @@ var Mentions = function () {
             }
             this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
             var users = this.users.filter(function (u) {
-                return u.username.startsWith(_this2.query);
+                var searchPattern = new RegExp(_this2.query, 'gi');
+                if (searchPattern.test(u.username)) {
+                    return u.username;
+                } else if (searchPattern.test(u.fullName)) {
+                    return u.fullName;
+                }
             }).sort(function (u1, u2) {
                 return u1.username > u2.username;
             });
@@ -277,7 +278,7 @@ var Mentions = function () {
                 };
             };
             users.forEach(function (user, i) {
-                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "matched" }, "@" + _this3.query), h('span', { className: "unmatched" }, user.username.slice(_this3.query.length)), h('span', { className: "mention--name" }, user.name)));
+                var li = h('li', {}, h('button', { type: "button" }, h('span', { className: "matched" }, "@" + _this3.query + user.username.slice(_this3.query.length)), h('span', { className: "unmatched" }, user.username.slice(_this3.query.length)), h('span', { className: "mention--username" }, user.username), h('span', { className: "mention--name" }, user.name)));
                 _this3.container.appendChild(li);
 
                 buttons[i] = li.firstChild;

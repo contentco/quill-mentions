@@ -10,7 +10,7 @@ const h = (tag, attrs, ...children) => {
 };
 
 const Inline = Quill.import('blots/inline');
-export class MentionBlot extends Inline {
+class MentionBlot extends Inline {
         static create(label) {
             const node = super.create();
             node.dataset.label = label;
@@ -120,7 +120,14 @@ class Mentions {
         }
         this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
         const users = this.users
-              .filter(u => u.username.startsWith(this.query))
+              .filter(u => {
+              	const searchPattern = new RegExp(this.query, 'gi');
+				if (searchPattern.test(u.username)){
+					return u.username;
+				} else if (searchPattern.test(u.fullName)) {
+					return u.fullName;
+				}
+              })
               .sort((u1, u2) => u1.username > u2.username);
         this.renderCompletions(users);
     }
@@ -151,8 +158,9 @@ class Mentions {
         users.forEach((user, i) => {
             const li = h('li', {},
                          h('button', {type: "button"},
-                           h('span', {className: "matched"}, "@" + this.query),
+                           h('span', {className: "matched"}, "@" + this.query + user.username.slice(this.query.length)),
                            h('span', {className: "unmatched"}, user.username.slice(this.query.length)),
+                           h('span', {className: "mention--username"}, user.username),
                            h('span', {className: "mention--name"}, user.name)
                          )
                          );
