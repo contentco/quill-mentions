@@ -4,7 +4,7 @@ const h = (tag, attrs, ...children) => {
   children.forEach(child => {
     if (typeof child === "string")
       child = document.createTextNode(child);
-    elem.appendChild(child);
+      elem.appendChild(child);
   });
   return elem;
 };
@@ -163,7 +163,7 @@ class Mentions {
           h("span", {className: "matched"}, "@" + this.query + user.username.slice(this.query.length)),
           h("span", {className: "unmatched"}, user.username.slice(this.query.length)),
           h("span", {className: "mention--username"}, user.username),
-          h("span", {className: "mention--name"}, user.name)
+          h("span", {className: "mention--name"}, user.fullName)
         )
       );
       this.container.appendChild(li);

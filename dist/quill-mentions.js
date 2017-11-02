@@ -280,7 +280,7 @@ var Mentions = function () {
         };
       };
       users.forEach(function (user, i) {
-        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + _this3.query + user.username.slice(_this3.query.length)), h("span", { className: "unmatched" }, user.username.slice(_this3.query.length)), h("span", { className: "mention--username" }, user.username), h("span", { className: "mention--name" }, user.name)));
+        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + _this3.query + user.username.slice(_this3.query.length)), h("span", { className: "unmatched" }, user.username.slice(_this3.query.length)), h("span", { className: "mention--username" }, user.username), h("span", { className: "mention--name" }, user.fullName)));
         _this3.container.appendChild(li);
 
         buttons[i] = li.firstChild;
