@@ -93,6 +93,7 @@ class Mentions {
   }
 
   renderMentionBox(users) {
+    this.open = !this.open;
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     const buttons = Array(users.length);
     this.buttons = buttons;
@@ -125,8 +126,27 @@ class Mentions {
       // buttons[i].addEventListener("focus", () => this.focusedButton = i);
       // buttons[i].addEventListener("unfocus", () => this.focusedButton = null);
     });
-    this.container.style.display = "block";
-    console.log(this.container.style.display);
+    let atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
+    this.container.style.left = atSignBounds.left + "px";
+    let windowHeight = window.innerHeight;
+    let editorPos = this.quill.container.getBoundingClientRect().top;
+
+    if (editorPos > windowHeight / 2) {
+      this.container.style.top = "auto";
+      this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
+    } else {
+      this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
+      this.container.style.bottom = "auto";
+    }
+
+    this.container.style.zIndex = 99;
+    if (this.open) {
+      this.container.style.display = "block";
+    }
+    else{
+      this.container.style.display = "none";
+    }
+
   }
 
   onAtKey(range) {
