@@ -58,6 +58,13 @@ class Mentions {
     this.onSelectionChange = this.maybeUnfocus.bind(this);
     this.onTextChange = this.update.bind(this);
 
+    this.mentionBtnControl  = document.createElement('div');
+    this.mentionBtnControl.classList.add('textarea-mention-control');
+    this.mentionBtnControl.style.position   = "absolute";
+    this.mentionBtnControl.innerHTML = '@';
+    this.quill.container.appendChild(this.mentionBtnControl);
+    this.mentionBtnControl.addEventListener('click', this.clickMentionBtn.bind(this),false);
+
     this.open = false;
     this.atIndex = null;
     this.focusedButton = null;
@@ -78,6 +85,48 @@ class Mentions {
       collapsed: true,
       format: ["mention"]
     }, this.handleArrow.bind(this));
+  }
+
+  clickMentionBtn(){
+    const users = this.users;
+    this.renderMentionBox(users);
+  }
+
+  renderMentionBox(users) {
+    while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
+    const buttons = Array(users.length);
+    this.buttons = buttons;
+    const handler = (i, user) => event => {
+      if (event.key === "ArrowDown" || event.keyCode === 40) {
+        event.preventDefault();
+        buttons[Math.min(buttons.length - 1, i + 1)].focus();
+      } else if (event.key === "ArrowUp" || event.keyCode === 38) {
+        event.preventDefault();
+        buttons[Math.max(0, i - 1)].focus();
+      } else if (event.key === "Enter" || event.keyCode === 13
+         || event.key === " " || event.keyCode === 32
+         || event.key === "Tab" || event.keyCode === 9) {
+        event.preventDefault();
+        this.close(user);
+      }
+    };
+    users.forEach((user, i) => {
+      const li = h("li", {},
+        h("button", {type: "button"},
+          h("span", {className: "matched"}, "@" + user.username),
+          h("span", {className: "mention--name"}, user.fullName)
+        )
+      );
+      this.container.appendChild(li);
+
+      buttons[i] = li.firstChild;
+      buttons[i].addEventListener("keydown", handler(i, user));
+      buttons[i].addEventListener("mousedown", () => this.mentionBoxClose(user));
+      // buttons[i].addEventListener("focus", () => this.focusedButton = i);
+      // buttons[i].addEventListener("unfocus", () => this.focusedButton = null);
+    });
+    this.container.style.display = "block";
+    console.log(this.container.style.display);
   }
 
   onAtKey(range) {
@@ -161,8 +210,6 @@ class Mentions {
       const li = h("li", {},
         h("button", {type: "button"},
           h("span", {className: "matched"}, "@" + this.query + user.username.slice(this.query.length)),
-          h("span", {className: "unmatched"}, user.username.slice(this.query.length)),
-          h("span", {className: "mention--username"}, user.username),
           h("span", {className: "mention--name"}, user.fullName)
         )
       );
@@ -192,6 +239,18 @@ class Mentions {
     this.quill.focus();
     this.open = false;
     this.onClose && this.onClose(value);
+  }
+
+  mentionBoxClose(value){
+    let range = this.quill.getSelection();
+    if (value) {
+      const {label, username} = value;
+      this.quill.insertText(this.quill.selection.savedRange.index, "@" + username, "mention", label, Quill.sources.USER);
+      this.quill.insertText(this.quill.selection.savedRange.index + username.length + 1, " ", "mention", false, Quill.sources.USER);
+      this.quill.setSelection(this.quill.selection.savedRange.index + username.length + 2, 0, Quill.sources.SILENT);
+    }
+    this.container.style.display = "none";
+    this.quill.focus();
   }
 
 }
