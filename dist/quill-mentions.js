@@ -156,11 +156,13 @@ var Mentions = function () {
     _classCallCheck(this, Mentions);
 
     this.quill = quill;
-    this.quill.root.setAttribute('data-gramm', false);
     this.onClose = props.onClose;
     this.onOpen = props.onOpen;
     this.users = props.users;
-    if (!this.users) return;
+    if (!this.users || this.users && this.users.length < 1) {
+      return;
+    }
+    this.quill.root.setAttribute('data-gramm', false);
     this.container = this.quill.container.parentNode.querySelector(props.container);
     this.container = document.createElement("ul");
     this.container.classList.add("completions");
