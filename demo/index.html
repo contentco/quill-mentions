@@ -16,8 +16,11 @@
         </style>
     </head>
     <body>
-        <div class="container" style="max-height:50px;margin-top:300px;">
+        <div class="container" style="max-height:50px;margin-top:200px;">
             <div id="quill-editor" style="max-height: 50px;"></div>
+        </div>
+        <div class="container" style="max-height:30px;margin-top:40px;">
+            <div id="quill-editor-two" style="max-height: 300px;"></div>
         </div>
         <script src="../bower_components/quill/quill.js"></script>
         <script src="../dist/quill-mentions.js"></script>
@@ -50,7 +53,14 @@
                     }
                   },
                   theme: 'snow'
-        });
+              });
+
+              var quillTwo = new Quill('#quill-editor-two', {
+                  modules:{
+                      toolbar: true,
+                    },
+                    theme: 'snow'
+                });
 
         </script>
     </body>

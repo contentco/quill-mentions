@@ -45,7 +45,6 @@ Quill.register({
 class Mentions {
   constructor(quill, props) {
     this.quill = quill;
-    console.log(this.quill);
     this.quill.root.setAttribute('data-gramm', false);
     this.onClose = props.onClose;
     this.onOpen = props.onOpen;
