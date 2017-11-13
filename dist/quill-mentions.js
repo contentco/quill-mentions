@@ -156,6 +156,8 @@ var Mentions = function () {
     _classCallCheck(this, Mentions);
 
     this.quill = quill;
+    console.log(this.quill);
+    this.quill.root.setAttribute('data-gramm', false);
     this.onClose = props.onClose;
     this.onOpen = props.onOpen;
     this.users = props.users;
@@ -172,7 +174,7 @@ var Mentions = function () {
     this.mentionBtnControl = document.createElement('div');
     this.mentionBtnControl.classList.add('textarea-mention-control');
     this.mentionBtnControl.style.position = "absolute";
-    this.mentionBtnControl.innerHTML = '@';
+    this.mentionBtnControl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 50 50"><path fill="#000" fill-rule="evenodd" d="M24.7 20.92c-1.67 0-2.65 1.33-2.65 3.56 0 2.22.98 3.57 2.62 3.57 1.67 0 2.72-1.36 2.72-3.57 0-2.2-1.06-3.56-2.7-3.56zm.5-9.58c7.47 0 12.6 4.72 12.6 11.6 0 4.98-2.36 8.1-6.14 8.1-1.96 0-3.38-.95-3.72-2.45h-.28c-.66 1.57-1.94 2.38-3.75 2.38-3.24 0-5.4-2.62-5.4-6.6 0-3.8 2.13-6.36 5.25-6.36 1.67 0 3.03.8 3.66 2.2h.3v-1.86h3.14v8.28c0 1.1.55 1.75 1.5 1.75 1.58 0 2.6-2 2.6-5.18 0-5.66-3.9-9.34-9.85-9.34-6.05 0-10.26 4.34-10.26 10.57 0 6.35 4.2 10.35 10.85 10.35 1.66 0 3.36-.2 4.24-.52v2.55c-1.22.36-2.83.56-4.5.56C17.32 37.4 12 32.2 12 24.37c0-7.72 5.4-13.04 13.2-13.04z"/></svg>';
     this.quill.container.appendChild(this.mentionBtnControl);
     this.mentionBtnControl.addEventListener('click', this.clickMentionBtn.bind(this), false);
 

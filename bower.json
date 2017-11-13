@@ -19,5 +19,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "quill": "https://github.com/contentco/quill/raw/master/.release/quill.tar.gz"
+  }
 }
