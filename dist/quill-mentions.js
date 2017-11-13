@@ -293,6 +293,11 @@ var Mentions = function () {
       this.quill.once("selection-change", this.onSelectionChange);
       this.update();
       this.onOpen && this.onOpen();
+      if (this.open) {
+        this.container.style.display = "block";
+      } else {
+        this.container.style.display = "none";
+      }
     }
   }, {
     key: "handleArrow",
@@ -403,6 +408,7 @@ var Mentions = function () {
         this.quill.setSelection(this.quill.selection.savedRange.index + username.length + 2, 0, Quill.sources.SILENT);
       }
       this.container.style.display = "none";
+      this.open = false;
       this.quill.focus();
     }
   }]);

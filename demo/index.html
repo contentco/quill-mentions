@@ -5,15 +5,6 @@
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="https://cdn.quilljs.com/1.2.2/quill.snow.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../dist/quill-mentions.css">
-        <style>
-          .textarea-mention-control {
-              width: 25px;
-              height: 25px;
-              right: 4px;
-              top: 10px;
-              z-index:4;
-          }
-        </style>
     </head>
     <body>
         <div class="container" style="max-height:50px;margin-top:200px;">
@@ -23,8 +14,8 @@
             <div id="quill-editor-two" style="max-height: 300px;"></div>
         </div>
         <script src="../bower_components/quill/quill.js"></script>
-        <script src="../dist/quill-mentions.js"></script>
-        <!--<script src="../src/module-mentions.js"></script>-->
+        <!-- <script src="../dist/quill-mentions.js"></script> -->
+        <script src="../src/module-mentions.js"></script>
         <script type="text/javascript">
             var quill = new Quill('#quill-editor', {
                 modules:{
