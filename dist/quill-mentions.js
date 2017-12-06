@@ -318,9 +318,11 @@ var Mentions = function () {
       var users = this.users.filter(function (u) {
         var searchPattern = new RegExp(_this3.query, "gi");
         if (searchPattern.test(u.username)) {
-          return u.username;
+          u.searchKey = 'username';
+          return u;
         } else if (searchPattern.test(u.fullName)) {
-          return u.fullName;
+          u.searchKey = 'name';
+          return u;
         }
       }).sort(function (u1, u2) {
         return u1.username > u2.username;
@@ -357,7 +359,7 @@ var Mentions = function () {
         };
       };
       users.forEach(function (user, i) {
-        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + _this4.query + user.username.slice(_this4.query.length)), h("span", { className: "mention--name" }, user.fullName)));
+        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + (user.searchKey === 'username' ? _this4.query + user.username.slice(_this4.query.length) : user.username)), h("span", { className: "mention--name" }, ' ' + (user.searchKey === 'name' ? _this4.query + user.fullName.slice(_this4.query.length) : user.fullName))));
         _this4.container.appendChild(li);
 
         buttons[i] = li.firstChild;

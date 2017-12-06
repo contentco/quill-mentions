@@ -203,9 +203,11 @@ class Mentions {
       .filter(u => {
         const searchPattern = new RegExp(this.query, "gi");
         if (searchPattern.test(u.username)){
-          return u.username;
+          u.searchKey = 'username';
+          return u;
         } else if (searchPattern.test(u.fullName)) {
-          return u.fullName;
+          u.searchKey = 'name';
+          return u;
         }
       })
       .sort((u1, u2) => u1.username > u2.username);
@@ -217,7 +219,7 @@ class Mentions {
     this.close(null);
   }
 
-  renderCompletions(users) {
+  renderCompletions(users) {  	
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     const buttons = Array(users.length);
     this.buttons = buttons;
@@ -238,8 +240,8 @@ class Mentions {
     users.forEach((user, i) => {
       const li = h("li", {},
         h("button", {type: "button"},
-          h("span", {className: "matched"}, "@" + this.query + user.username.slice(this.query.length)),
-          h("span", {className: "mention--name"}, user.fullName)
+          h("span", {className: "matched"}, "@" + (user.searchKey === 'username' ? (this.query + user.username.slice(this.query.length)) : user.username)),
+          h("span", {className: "mention--name"}, ' '+ (user.searchKey === 'name' ? (this.query + user.fullName.slice(this.query.length)) : user.fullName))
         )
       );
       this.container.appendChild(li);
