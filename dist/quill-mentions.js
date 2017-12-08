@@ -279,18 +279,29 @@ var Mentions = function () {
       if (!this.open) return true;
 
       if (this.currentPosition >= 0) {
+
         if (keyType === "ArrowDown") {
           this.currentPosition = Math.min(this.list.length - 1, this.currentPosition + 1);
           if (this.list[Math.min(this.list.length - 1, this.currentPosition) - 1]) {
             this.list[Math.min(this.list.length - 1, this.currentPosition) - 1].classList.remove("active");
           }
           this.list[Math.min(this.list.length - 1, this.currentPosition)].classList.add("active");
+
+          var top = this.list[Math.min(this.list.length - 1, this.currentPosition)].offsetTop + 35;
+          if (top > this.container.offsetHeight) {
+            this.container.scrollTop = top;
+          }
         } else if (keyType === "ArrowUp") {
           this.currentPosition = Math.max(0, this.currentPosition - 1);
           if (this.list[Math.max(0, this.currentPosition) + 1]) {
             this.list[Math.max(0, this.currentPosition) + 1].classList.remove("active");
           }
           this.list[Math.max(0, this.currentPosition)].classList.add("active");
+
+          var top = this.list[Math.max(0, this.currentPosition)].offsetTop;
+          if (top < this.container.offsetHeight) {
+            this.container.scrollTop = top;
+          }
         }
       }
     }
@@ -376,7 +387,9 @@ var Mentions = function () {
 
       if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length) {
         this.currentPosition = 0;
-        this.list[this.currentPosition].classList.add('active');
+        if (this.list[this.currentPosition]) {
+          this.list[this.currentPosition].classList.add('active');
+        }
       }
 
       this.open = true;
