@@ -182,6 +182,8 @@ var Mentions = function () {
     this.open = false;
     this.atIndex = null;
     this.focusedButton = null;
+    this.currentPosition = null;
+    this.prevUsers = null;
 
     quill.keyboard.addBinding({
       key: 50,
@@ -192,13 +194,19 @@ var Mentions = function () {
       key: 40,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this));
+    }, this.handleArrow.bind(this, 'ArrowDown'));
 
     quill.keyboard.addBinding({
       key: 38,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this));
+    }, this.handleArrow.bind(this, 'ArrowUp'));
+
+    quill.keyboard.addBinding({
+      key: 27,
+      collapsed: true,
+      format: ["mention"]
+    }, this.handleEsc.bind(this, 'ArrowUp'));
   }
 
   _createClass(Mentions, [{
@@ -210,39 +218,9 @@ var Mentions = function () {
   }, {
     key: "renderMentionBox",
     value: function renderMentionBox(users) {
-      var _this2 = this;
-
-      this.open = !this.open;
-      while (this.container.firstChild) {
-        this.container.removeChild(this.container.firstChild);
-      }var buttons = Array(users.length);
-      this.buttons = buttons;
-      var handler = function handler(i, user) {
-        return function (event) {
-          if (event.key === "ArrowDown" || event.keyCode === 40) {
-            event.preventDefault();
-            buttons[Math.min(buttons.length - 1, i + 1)].focus();
-          } else if (event.key === "ArrowUp" || event.keyCode === 38) {
-            event.preventDefault();
-            buttons[Math.max(0, i - 1)].focus();
-          } else if (event.key === "Enter" || event.keyCode === 13 || event.key === " " || event.keyCode === 32 || event.key === "Tab" || event.keyCode === 9) {
-            event.preventDefault();
-            _this2.close(user);
-          }
-        };
-      };
-      users.forEach(function (user, i) {
-        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + user.username), h("span", { className: "mention--name" }, user.fullName)));
-        _this2.container.appendChild(li);
-
-        buttons[i] = li.firstChild;
-        buttons[i].addEventListener("keydown", handler(i, user));
-        buttons[i].addEventListener("mousedown", function () {
-          return _this2.mentionBoxClose(user);
-        });
-        // buttons[i].addEventListener("focus", () => this.focusedButton = i);
-        // buttons[i].addEventListener("unfocus", () => this.focusedButton = null);
-      });
+      this.currentPosition = null;
+      //this.open = !this.open;
+      this.isAtTrigger = false;
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
       this.container.style.left = atSignBounds.left + "px";
       var windowHeight = window.innerHeight;
@@ -255,18 +233,19 @@ var Mentions = function () {
         this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
         this.container.style.bottom = "auto";
       }
-
       this.container.style.zIndex = 99;
-      if (this.open) {
-        this.container.style.display = "block";
-      } else {
-        this.container.style.display = "none";
-      }
+      this.renderCompletions(this.users);
+    }
+  }, {
+    key: "handleEsc",
+    value: function handleEsc() {
+      this.close(null);
     }
   }, {
     key: "onAtKey",
     value: function onAtKey(range) {
       if (this.open) return true;
+      this.isAtTrigger = true;
       if (range.length > 0) {
         this.quill.deleteText(range.index, range.length, Quill.sources.USER);
       }
@@ -288,27 +267,37 @@ var Mentions = function () {
       }
 
       this.container.style.zIndex = 99;
-      this.open = true;
+      //this.open = true;
       this.quill.on("text-change", this.onTextChange);
       this.quill.once("selection-change", this.onSelectionChange);
       this.update();
       this.onOpen && this.onOpen();
-      if (this.open) {
-        this.container.style.display = "block";
-      } else {
-        this.container.style.display = "none";
-      }
     }
   }, {
     key: "handleArrow",
-    value: function handleArrow() {
+    value: function handleArrow(keyType) {
       if (!this.open) return true;
-      this.buttons[0].focus();
+
+      if (this.currentPosition >= 0) {
+        if (keyType === "ArrowDown") {
+          this.currentPosition = Math.min(this.list.length - 1, this.currentPosition + 1);
+          if (this.list[Math.min(this.list.length - 1, this.currentPosition) - 1]) {
+            this.list[Math.min(this.list.length - 1, this.currentPosition) - 1].classList.remove("active");
+          }
+          this.list[Math.min(this.list.length - 1, this.currentPosition)].classList.add("active");
+        } else if (keyType === "ArrowUp") {
+          this.currentPosition = Math.max(0, this.currentPosition - 1);
+          if (this.list[Math.max(0, this.currentPosition) + 1]) {
+            this.list[Math.max(0, this.currentPosition) + 1].classList.remove("active");
+          }
+          this.list[Math.max(0, this.currentPosition)].classList.add("active");
+        }
+      }
     }
   }, {
     key: "update",
-    value: function update() {
-      var _this3 = this;
+    value: function update(val) {
+      var _this2 = this;
 
       var sel = this.quill.getSelection().index;
       if (this.atIndex >= sel) {
@@ -316,7 +305,7 @@ var Mentions = function () {
       }
       this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
       var users = this.users.filter(function (u) {
-        var searchPattern = new RegExp(_this3.query, "gi");
+        var searchPattern = new RegExp(_this2.query, "gi");
         if (searchPattern.test(u.username)) {
           u.searchKey = 'username';
           return u;
@@ -338,70 +327,94 @@ var Mentions = function () {
   }, {
     key: "renderCompletions",
     value: function renderCompletions(users) {
-      var _this4 = this;
+      var _this3 = this;
 
+      this.list = this.container.childNodes;
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
       }var buttons = Array(users.length);
       this.buttons = buttons;
-      var handler = function handler(i, user) {
+      var handler = function handler() {
         return function (event) {
-          if (event.key === "ArrowDown" || event.keyCode === 40) {
+          if (event.key === "Enter" || event.keyCode === 13 || event.key === "Tab" || event.keyCode === 9 || event.type === "click") {
+
             event.preventDefault();
-            buttons[Math.min(buttons.length - 1, i + 1)].focus();
-          } else if (event.key === "ArrowUp" || event.keyCode === 38) {
-            event.preventDefault();
-            buttons[Math.max(0, i - 1)].focus();
-          } else if (event.key === "Enter" || event.keyCode === 13 || event.key === " " || event.keyCode === 32 || event.key === "Tab" || event.keyCode === 9) {
-            event.preventDefault();
-            _this4.close(user);
+            users.forEach(function (user, i) {
+              if (_this3.list[_this3.currentPosition] && _this3.list[_this3.currentPosition].id && user.id == _this3.list[_this3.currentPosition].id) {
+                if (_this3.isAtTrigger) {
+                  _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false);
+                } else {
+                  _this3.mentionBoxClose(user);
+                }
+              }
+            });
           }
         };
       };
-      users.forEach(function (user, i) {
-        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + (user.searchKey === 'username' ? _this4.query + user.username.slice(_this4.query.length) : user.username)), h("span", { className: "mention--name" }, ' ' + (user.searchKey === 'name' ? _this4.query + user.fullName.slice(_this4.query.length) : user.fullName))));
-        _this4.container.appendChild(li);
 
-        buttons[i] = li.firstChild;
-        buttons[i].addEventListener("keydown", handler(i, user));
-        buttons[i].addEventListener("mousedown", function () {
-          return _this4.close(user);
-        });
-        buttons[i].addEventListener("focus", function () {
-          return _this4.focusedButton = i;
-        });
-        buttons[i].addEventListener("unfocus", function () {
-          return _this4.focusedButton = null;
-        });
+      var mouseHandler = function mouseHandler(i, user) {
+        return function (event) {
+          _this3.currentPosition = i;
+          _this3.list.forEach(function (list, i) {
+            if (list.classList.contains('active')) {
+              list.classList.remove("active");
+            }
+          });
+          _this3.list[i].classList.add("active");
+        };
+      };
+
+      users.forEach(function (user, i) {
+        var li = h("li", {}, h("button", { type: "button" }, h("span", { className: "matched" }, "@" + user.username), h("span", { className: "mention--name" }, user.fullName)
+        // h("span", {className: "matched"}, "@" + (user.searchKey === 'username' ? (this.query + user.username.slice(this.query.length)) : user.username)),
+        // h("span", {className: "mention--name"}, ' '+ (user.searchKey === 'name' ? (this.query + user.fullName.slice(this.query.length)) : user.fullName))
+        ));
+        _this3.container.appendChild(li);
+        li.setAttribute('id', user.id);
+        _this3.list[i].addEventListener("mouseenter", mouseHandler(i, user));
       });
+
+      if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length) {
+        this.currentPosition = 0;
+        this.list[this.currentPosition].classList.add('active');
+      }
+
+      this.open = true;
+      this.list = this.container.childNodes;
+      this.quill.container.addEventListener("keydown", handler(this));
+      this.container.addEventListener("click", handler(this));
       this.container.style.display = "block";
+      this.prevUsers = users;
     }
   }, {
     key: "close",
-    value: function close(value) {
+    value: function close(value, isEnter) {
+      //this.currentPosition = null;
       this.container.style.display = "none";
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
       }this.quill.off("selection-change", this.onSelectionChange);
       this.quill.off("text-change", this.onTextChange);
+
       if (value) {
         var label = value.label,
             username = value.username;
 
-        this.quill.deleteText(this.atIndex, this.query.length + 1, Quill.sources.USER);
+        this.quill.deleteText(this.atIndex, isEnter ? this.query.length + 2 : this.query.length + 1, Quill.sources.USER);
         this.quill.insertText(this.atIndex, "@" + username, "mention", label, Quill.sources.USER);
         this.quill.insertText(this.atIndex + username.length + 1, " ", "mention", false, Quill.sources.USER);
         this.quill.setSelection(this.atIndex + username.length + 2, 0, Quill.sources.SILENT);
       }
-      this.quill.focus();
       this.open = false;
       this.onClose && this.onClose(value);
     }
   }, {
     key: "mentionBoxClose",
     value: function mentionBoxClose(value) {
-      var range = this.quill.getSelection();
-      if (value) {
+      this.container.style.display = "none";
+      while (this.container.firstChild) {
+        this.container.removeChild(this.container.firstChild);
+      }if (value) {
         var label = value.label,
             username = value.username;
 
@@ -409,9 +422,7 @@ var Mentions = function () {
         this.quill.insertText(this.quill.selection.savedRange.index + username.length + 1, " ", "mention", false, Quill.sources.USER);
         this.quill.setSelection(this.quill.selection.savedRange.index + username.length + 2, 0, Quill.sources.SILENT);
       }
-      this.container.style.display = "none";
       this.open = false;
-      this.quill.focus();
     }
   }]);
 

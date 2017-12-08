@@ -71,65 +71,43 @@ class Mentions {
     this.open = false;
     this.atIndex = null;
     this.focusedButton = null;
+    this.currentPosition = null;
+    this.prevUsers = null;
 
     quill.keyboard.addBinding({
       key: 50,
       shiftKey: true,
     }, this.onAtKey.bind(this));
 
-    quill.keyboard.addBinding({
+    quill.keyboard.addBinding({ 
       key: 40,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this));
+    }, this.handleArrow.bind(this, 'ArrowDown'));
 
     quill.keyboard.addBinding({
       key: 38,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this));
+    }, this.handleArrow.bind(this, 'ArrowUp'));
+    
+    quill.keyboard.addBinding({
+      key: 27,
+      collapsed: true,
+      format: ["mention"]
+    }, this.handleEsc.bind(this, 'ArrowUp'));
   }
-
+	
   clickMentionBtn(){
     const users = this.users;
     this.renderMentionBox(users);
   }
 
   renderMentionBox(users) {
-    this.open = !this.open;
-    while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
-    const buttons = Array(users.length);
-    this.buttons = buttons;
-    const handler = (i, user) => event => {
-      if (event.key === "ArrowDown" || event.keyCode === 40) {
-        event.preventDefault();
-        buttons[Math.min(buttons.length - 1, i + 1)].focus();
-      } else if (event.key === "ArrowUp" || event.keyCode === 38) {
-        event.preventDefault();
-        buttons[Math.max(0, i - 1)].focus();
-      } else if (event.key === "Enter" || event.keyCode === 13
-         || event.key === " " || event.keyCode === 32
-         || event.key === "Tab" || event.keyCode === 9) {
-        event.preventDefault();
-        this.close(user);
-      }
-    };
-    users.forEach((user, i) => {
-      const li = h("li", {},
-        h("button", {type: "button"},
-          h("span", {className: "matched"}, "@" + user.username),
-          h("span", {className: "mention--name"}, user.fullName)
-        )
-      );
-      this.container.appendChild(li);
-
-      buttons[i] = li.firstChild;
-      buttons[i].addEventListener("keydown", handler(i, user));
-      buttons[i].addEventListener("mousedown", () => this.mentionBoxClose(user));
-      // buttons[i].addEventListener("focus", () => this.focusedButton = i);
-      // buttons[i].addEventListener("unfocus", () => this.focusedButton = null);
-    });
-    let atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
+  	this.currentPosition = null;
+    //this.open = !this.open;
+    this.isAtTrigger = false;
+   	let atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
     this.container.style.left = atSignBounds.left + "px";
     let windowHeight = window.innerHeight;
     let editorPos = this.quill.container.getBoundingClientRect().top;
@@ -141,19 +119,18 @@ class Mentions {
       this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
       this.container.style.bottom = "auto";
     }
-
     this.container.style.zIndex = 99;
-    if (this.open) {
-      this.container.style.display = "block";
-    }
-    else{
-      this.container.style.display = "none";
-    }
-
+    this.renderCompletions(this.users);
+   	
+  }
+  
+  handleEsc() {
+	this.close(null);
   }
 
   onAtKey(range) {
     if (this.open) return true;
+    this.isAtTrigger = true;
     if (range.length > 0) {
       this.quill.deleteText(range.index, range.length, Quill.sources.USER);
     }
@@ -175,25 +152,35 @@ class Mentions {
     }
 
     this.container.style.zIndex = 99;
-    this.open = true;
+    //this.open = true;
     this.quill.on("text-change", this.onTextChange);
     this.quill.once("selection-change", this.onSelectionChange);
     this.update();
     this.onOpen && this.onOpen();
-    if (this.open) {
-      this.container.style.display = "block";
-    }
-    else{
-      this.container.style.display = "none";
-    }
+    
   }
 
-  handleArrow() {
-    if (!this.open) return true;
-    this.buttons[0].focus();
+  handleArrow(keyType) {  	
+    if (!this.open) return true;   
+	
+	if (this.currentPosition >= 0) {
+		if (keyType === "ArrowDown") {
+			this.currentPosition = Math.min(this.list.length - 1, this.currentPosition + 1);			
+			if (this.list[Math.min(this.list.length - 1, this.currentPosition) - 1]) {
+				this.list[Math.min(this.list.length - 1, this.currentPosition) - 1].classList.remove("active");	
+			}
+	    	this.list[Math.min(this.list.length - 1, this.currentPosition)].classList.add("active");
+		} else if (keyType === "ArrowUp") {
+			this.currentPosition = Math.max(0, this.currentPosition - 1);	
+			if (this.list[Math.max(0, this.currentPosition) + 1]) {
+				this.list[Math.max(0, this.currentPosition) + 1].classList.remove("active");
+			}		
+			this.list[Math.max(0, this.currentPosition)].classList.add("active");
+		}
+	}
   }
-
-  update() {
+ 
+  update(val) {
     const sel = this.quill.getSelection().index;
     if (this.atIndex >= sel) {
       return this.close(null);
@@ -219,71 +206,95 @@ class Mentions {
     this.close(null);
   }
 
-  renderCompletions(users) {  	
+  renderCompletions(users) {  
+  	this.list = this.container.childNodes;
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     const buttons = Array(users.length);
     this.buttons = buttons;
-    const handler = (i, user) => event => {
-      if (event.key === "ArrowDown" || event.keyCode === 40) {
-        event.preventDefault();
-        buttons[Math.min(buttons.length - 1, i + 1)].focus();
-      } else if (event.key === "ArrowUp" || event.keyCode === 38) {
-        event.preventDefault();
-        buttons[Math.max(0, i - 1)].focus();
-      } else if (event.key === "Enter" || event.keyCode === 13
-         || event.key === " " || event.keyCode === 32
-         || event.key === "Tab" || event.keyCode === 9) {
-        event.preventDefault();
-        this.close(user);
+    const handler = () => event => {
+      if (event.key === "Enter" || event.keyCode === 13
+         || event.key === "Tab" || event.keyCode === 9
+         || event.type === "click") {  
+         	
+    	event.preventDefault();
+  		users.forEach((user, i) => {
+	     if(this.list[this.currentPosition] && this.list[this.currentPosition].id && user.id == this.list[this.currentPosition].id) {
+	     	if (this.isAtTrigger) {
+	     		this.close(user, (event.key === "Enter" || event.keyCode === 13) ? true: false);
+	     	} else {
+	     		this.mentionBoxClose(user);	
+	     	}
+	     }
+	    });
       }
     };
+    
+    const mouseHandler = (i, user) => event => {
+    	this.currentPosition = i;
+    	this.list.forEach((list, i) => {
+	    	if (list.classList.contains('active')) {
+	    		list.classList.remove("active");
+	    	}
+		});
+    	this.list[i].classList.add("active");
+    }
+    
     users.forEach((user, i) => {
       const li = h("li", {},
         h("button", {type: "button"},
-          h("span", {className: "matched"}, "@" + (user.searchKey === 'username' ? (this.query + user.username.slice(this.query.length)) : user.username)),
-          h("span", {className: "mention--name"}, ' '+ (user.searchKey === 'name' ? (this.query + user.fullName.slice(this.query.length)) : user.fullName))
+           	h("span", {className: "matched"}, "@" + user.username),
+          	h("span", {className: "mention--name"}, user.fullName)
+          // h("span", {className: "matched"}, "@" + (user.searchKey === 'username' ? (this.query + user.username.slice(this.query.length)) : user.username)),
+          // h("span", {className: "mention--name"}, ' '+ (user.searchKey === 'name' ? (this.query + user.fullName.slice(this.query.length)) : user.fullName))
         )
       );
-      this.container.appendChild(li);
-
-      buttons[i] = li.firstChild;
-      buttons[i].addEventListener("keydown", handler(i, user));
-      buttons[i].addEventListener("mousedown", () => this.close(user));
-      buttons[i].addEventListener("focus", () => this.focusedButton = i);
-      buttons[i].addEventListener("unfocus", () => this.focusedButton = null);
+      this.container.appendChild(li);		
+      li.setAttribute('id', user.id);
+      this.list[i].addEventListener("mouseenter", mouseHandler(i, user));
     });
+        
+    if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length) {
+    	this.currentPosition = 0;
+    	this.list[this.currentPosition].classList.add('active');
+    }
+    
+    this.open = true;
+	this.list = this.container.childNodes;
+	this.quill.container.addEventListener("keydown", handler(this));
+	this.container.addEventListener("click", handler(this));
     this.container.style.display = "block";
+    this.prevUsers = users;
   }
 
-  close(value) {
+  close(value, isEnter) { 
+  	//this.currentPosition = null;
     this.container.style.display = "none";
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     this.quill.off("selection-change", this.onSelectionChange);
     this.quill.off("text-change", this.onTextChange);
+    
     if (value) {
       const {label, username} = value;
-      this.quill.deleteText(this.atIndex, this.query.length + 1, Quill.sources.USER);
+      this.quill.deleteText(this.atIndex, isEnter ? this.query.length + 2 : this.query.length + 1, Quill.sources.USER);	
       this.quill.insertText(this.atIndex, "@" + username, "mention", label, Quill.sources.USER);
       this.quill.insertText(this.atIndex + username.length + 1, " ", "mention", false, Quill.sources.USER);
       this.quill.setSelection(this.atIndex + username.length + 2, 0, Quill.sources.SILENT);
-    }
-    this.quill.focus();
+    }  
     this.open = false;
     this.onClose && this.onClose(value);
   }
 
-  mentionBoxClose(value){
-    let range = this.quill.getSelection();
+  mentionBoxClose(value){   	
+   	this.container.style.display = "none";
+    while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
+    
     if (value) {
-      const {label, username} = value;
+      const {label, username} = value;      
       this.quill.insertText(this.quill.selection.savedRange.index, "@" + username, "mention", label, Quill.sources.USER);
       this.quill.insertText(this.quill.selection.savedRange.index + username.length + 1, " ", "mention", false, Quill.sources.USER);
       this.quill.setSelection(this.quill.selection.savedRange.index + username.length + 2, 0, Quill.sources.SILENT);
-    }
-    this.container.style.display = "none";
+    }  
     this.open = false;
-    this.quill.focus();
   }
-
 }
 Quill.register("modules/mentions", Mentions);

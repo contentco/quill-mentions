@@ -32,7 +32,13 @@
     cursor: pointer;
     padding: 8px 12px;
 }
-.completions > li > button:hover {
+.completions > li.active > button {
+    background: $blue;
+    span {
+        color: $white;
+    }
+}
+/*.completions > li > button:hover {
     background: $blue;
     span {
       color: $white;
@@ -44,7 +50,7 @@
       color: $white;
     }
     outline: none;
-}
+}*/
 .completions > li > button > .mention--username {
     font-weight: 600;
     font-size: 15px;
