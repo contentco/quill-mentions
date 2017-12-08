@@ -218,11 +218,18 @@ var Mentions = function () {
   }, {
     key: "renderMentionBox",
     value: function renderMentionBox(users) {
-      this.currentPosition = null;
-      //this.open = !this.open;
+      this.open = !this.open;
       this.isAtTrigger = false;
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
-      this.container.style.left = atSignBounds.left + "px";
+
+      if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
+        this.container.style.left = 'auto';
+        this.container.style.right = 0;
+      } else {
+        this.container.style.left = atSignBounds.left + "px";
+      }
+
+      //this.container.style.left = atSignBounds.left + "px";
       var windowHeight = window.innerHeight;
       var editorPos = this.quill.container.getBoundingClientRect().top;
 
@@ -234,7 +241,7 @@ var Mentions = function () {
         this.container.style.bottom = "auto";
       }
       this.container.style.zIndex = 99;
-      this.renderCompletions(this.users);
+      this.renderCompletions(this.users, true);
     }
   }, {
     key: "handleEsc",
@@ -344,7 +351,7 @@ var Mentions = function () {
     }
   }, {
     key: "renderCompletions",
-    value: function renderCompletions(users) {
+    value: function renderCompletions(users, isMentionBox) {
       var _this3 = this;
 
       this.list = this.container.childNodes;
@@ -392,18 +399,26 @@ var Mentions = function () {
         _this3.list[i].addEventListener("mouseenter", mouseHandler(i, user));
       });
 
-      if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length) {
+      if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length || this.currentPosition === null) {
         this.currentPosition = 0;
-        if (this.list[this.currentPosition]) {
-          this.list[this.currentPosition].classList.add('active');
-        }
       }
 
-      this.open = true;
+      if (this.currentPosition >= 0 && this.list[this.currentPosition]) {
+        this.list[this.currentPosition].classList.add('active');
+      }
+
+      if (!isMentionBox) {
+        this.open = true;
+      }
+
       this.list = this.container.childNodes;
       this.quill.container.addEventListener("keydown", handler(this));
       this.container.addEventListener("click", handler(this));
-      this.container.style.display = "block";
+      if (this.open) {
+        this.container.style.display = "block";
+      } else {
+        this.container.style.display = "none";
+      }
       this.prevUsers = users;
     }
   }, {
