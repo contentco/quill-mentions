@@ -139,7 +139,14 @@ class Mentions {
     this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
 
     this.atIndex = range.index;
-    this.container.style.left = atSignBounds.left + "px";
+    
+	if ((atSignBounds.left + 230) > this.quill.container.offsetWidth) {
+		this.container.style.left = 'auto';
+		this.container.style.right = 0;
+	} else {
+		this.container.style.left = atSignBounds.left + "px";	
+	}
+    
     let windowHeight = window.innerHeight;
     let editorPos = this.quill.container.getBoundingClientRect().top;
 
