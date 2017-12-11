@@ -207,6 +207,13 @@ var Mentions = function () {
       collapsed: true,
       format: ["mention"]
     }, this.handleEsc.bind(this, 'ArrowUp'));
+
+    quill.keyboard.addBinding({
+      key: 13,
+      collapsed: true
+    }, this.handleEnter.bind(this));
+
+    quill.keyboard.bindings[13].unshift(quill.keyboard.bindings[13].pop());
   }
 
   _createClass(Mentions, [{
@@ -219,7 +226,8 @@ var Mentions = function () {
     key: "renderMentionBox",
     value: function renderMentionBox(users) {
       this.open = !this.open;
-      this.isAtTrigger = false;
+
+      this.isBoxRender = true;
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
 
       if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
@@ -249,10 +257,20 @@ var Mentions = function () {
       this.close(null);
     }
   }, {
+    key: "handleEnter",
+    value: function handleEnter() {
+      if (this.open) return false;
+      return true;
+    }
+  }, {
     key: "onAtKey",
     value: function onAtKey(range) {
-      if (this.open) return true;
-      this.isAtTrigger = true;
+      // if (this.open) return true;
+      if (this.open) {
+        close(null);
+        this.isBoxRender = false;
+      }
+
       if (range.length > 0) {
         this.quill.deleteText(range.index, range.length, Quill.sources.USER);
       }
@@ -351,7 +369,7 @@ var Mentions = function () {
     }
   }, {
     key: "renderCompletions",
-    value: function renderCompletions(users, isMentionBox) {
+    value: function renderCompletions(users) {
       var _this3 = this;
 
       this.list = this.container.childNodes;
@@ -366,10 +384,10 @@ var Mentions = function () {
             event.preventDefault();
             users.forEach(function (user, i) {
               if (_this3.list[_this3.currentPosition] && _this3.list[_this3.currentPosition].id && user.id == _this3.list[_this3.currentPosition].id) {
-                if (_this3.isAtTrigger) {
-                  _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false);
-                } else {
+                if (_this3.isBoxRender) {
                   _this3.mentionBoxClose(user);
+                } else {
+                  _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false);
                 }
               }
             });
@@ -407,8 +425,12 @@ var Mentions = function () {
         this.list[this.currentPosition].classList.add('active');
       }
 
-      if (!isMentionBox) {
+      if (!this.isBoxRender) {
         this.open = true;
+      }
+
+      if (!users.length) {
+        this.open = false;
       }
 
       this.list = this.container.childNodes;
@@ -424,7 +446,6 @@ var Mentions = function () {
   }, {
     key: "close",
     value: function close(value, isEnter) {
-      //this.currentPosition = null;
       this.container.style.display = "none";
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
