@@ -96,7 +96,13 @@ class Mentions {
       collapsed: true,
       format: ["mention"]
     }, this.handleEsc.bind(this, 'ArrowUp'));
-    
+  
+	quill.keyboard.addBinding({
+      key: 13,
+      collapsed: true
+    }, this.handleEnter.bind(this));
+	
+	quill.keyboard.bindings[13].unshift(quill.keyboard.bindings[13].pop());
   }
 	
   clickMentionBtn(){
@@ -106,7 +112,8 @@ class Mentions {
 
   renderMentionBox(users) {
     this.open = !this.open;
-    this.isAtTrigger = false;
+   
+    this.isBoxRender = true;
    	let atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
    	
    	if ((atSignBounds.left + 230) > this.quill.container.offsetWidth) {
@@ -135,10 +142,19 @@ class Mentions {
   handleEsc() {
 	this.close(null);
   }
+  
+  handleEnter() {
+  	if (this.open) return false;  	
+  	return true;
+  }
 
   onAtKey(range) {
-    if (this.open) return true;
-    this.isAtTrigger = true;
+    // if (this.open) return true;
+    if (this.open) {
+    	close(null);
+    	this.isBoxRender = false;
+    }
+    
     if (range.length > 0) {
       this.quill.deleteText(range.index, range.length, Quill.sources.USER);
     }
@@ -232,7 +248,7 @@ class Mentions {
     this.close(null);
   }
 
-  renderCompletions(users, isMentionBox) {  
+  renderCompletions(users) {  
   	this.list = this.container.childNodes;
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     const buttons = Array(users.length);
@@ -245,10 +261,10 @@ class Mentions {
     	event.preventDefault();
   		users.forEach((user, i) => {
 	     if(this.list[this.currentPosition] && this.list[this.currentPosition].id && user.id == this.list[this.currentPosition].id) {
-	     	if (this.isAtTrigger) {
-	     		this.close(user, (event.key === "Enter" || event.keyCode === 13) ? true: false);
-	     	} else {
+	     	if (this.isBoxRender) {
 	     		this.mentionBoxClose(user);	
+	     	} else {
+	     		this.close(user, (event.key === "Enter" || event.keyCode === 13) ? true: false);
 	     	}
 	     }
 	    });
@@ -278,6 +294,8 @@ class Mentions {
       li.setAttribute('id', user.id);
       this.list[i].addEventListener("mouseenter", mouseHandler(i, user));
     });
+    
+    
        
     if (!this.open || !this.prevUsers || this.prevUsers.length !== users.length || this.currentPosition === null) {
     	this.currentPosition = 0;
@@ -287,11 +305,14 @@ class Mentions {
    		this.list[this.currentPosition].classList.add('active');	
     }
     
-    if (!isMentionBox) {
+    if (!this.isBoxRender) {
     	this.open = true;	
     }
     
-    
+    if (!users.length) {
+    	this.open = false;
+    }
+
 	this.list = this.container.childNodes;
 	this.quill.container.addEventListener("keydown", handler(this));
 	this.container.addEventListener("click", handler(this));
@@ -302,10 +323,10 @@ class Mentions {
       this.container.style.display = "none";
     }
     this.prevUsers = users;
+    
   }
 
   close(value, isEnter) { 
-  	//this.currentPosition = null;
     this.container.style.display = "none";
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     this.quill.off("selection-change", this.onSelectionChange);
