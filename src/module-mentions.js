@@ -151,9 +151,9 @@ class Mentions {
   onAtKey(range) {
     // if (this.open) return true;
     if (this.open) {
-    	close(null);
-    	this.isBoxRender = false;
+    	close(null);    	
     }
+    this.isBoxRender = false;
     
     if (range.length > 0) {
       this.quill.deleteText(range.index, range.length, Quill.sources.USER);
@@ -195,27 +195,24 @@ class Mentions {
     if (!this.open) return true;   
 	
 	if (this.currentPosition >= 0) {
-		
 		if (keyType === "ArrowDown") {
 			this.currentPosition = Math.min(this.list.length - 1, this.currentPosition + 1);			
 			if (this.list[Math.min(this.list.length - 1, this.currentPosition) - 1]) {
 				this.list[Math.min(this.list.length - 1, this.currentPosition) - 1].classList.remove("active");	
-			}
+			} 
 	    	this.list[Math.min(this.list.length - 1, this.currentPosition)].classList.add("active");
-	    	
-	    	var top = this.list[Math.min(this.list.length - 1, this.currentPosition)].offsetTop + 35;
-	    	if (top > this.container.offsetHeight) {
-	    		this.container.scrollTop = top;
-	    	}
+	    	var top = this.list[Math.min(this.list.length - 1, this.currentPosition)].offsetTop + this.list[Math.min(this.list.length - 1, this.currentPosition)].offsetHeight;	    	
+	    	if (top > this.container.offsetHeight) {	    		
+	    		this.container.scrollTop = top - this.container.offsetHeight;
+	    	} 
 		} else if (keyType === "ArrowUp") {
 			this.currentPosition = Math.max(0, this.currentPosition - 1);	
 			if (this.list[Math.max(0, this.currentPosition) + 1]) {
 				this.list[Math.max(0, this.currentPosition) + 1].classList.remove("active");
 			}		
 			this.list[Math.max(0, this.currentPosition)].classList.add("active");
-			
 			var top = this.list[Math.max(0, this.currentPosition)].offsetTop;
-	    	if (top < this.container.offsetHeight) {
+			if (this.container.offsetHeight < (this.container.scrollHeight - top)) {
 	    		this.container.scrollTop = top;
 	    	}
 		}
@@ -305,12 +302,11 @@ class Mentions {
    		this.list[this.currentPosition].classList.add('active');	
     }
     
-    if (!this.isBoxRender) {
-    	this.open = true;	
-    }
     
     if (!users.length) {
-    	this.open = false;
+    	this.open = false;	
+    } else if (!this.isBoxRender) {
+    	this.open = true;
     }
 
 	this.list = this.container.childNodes;
@@ -323,10 +319,10 @@ class Mentions {
       this.container.style.display = "none";
     }
     this.prevUsers = users;
-    
   }
 
   close(value, isEnter) { 
+  	this.container.scrollTop = 0;
     this.container.style.display = "none";
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     this.quill.off("selection-change", this.onSelectionChange);
@@ -343,7 +339,8 @@ class Mentions {
     this.onClose && this.onClose(value);
   }
 
-  mentionBoxClose(value){   	
+  mentionBoxClose(value){   
+  	this.container.scrollTop = 0;	
    	this.container.style.display = "none";
     while (this.container.firstChild) this.container.removeChild(this.container.firstChild);
     
