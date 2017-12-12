@@ -10,16 +10,19 @@ To use mentions, initiate a quill editor and add the ```mentions``` when definin
 
 ```javascript
 var users = [{
-        label: 'Aron',
-        username: 'Aron Hunt'
+        id: 11,
+        fullName: 'Aron Hunt',
+        username: 'aronhunt'
     },
     {
-        label: 'Bob',
-        username: 'Bobby Johnson'
+        label: 23,
+        fullName: 'Bobby Johnson',
+        username: 'bobbyjohnson'
     },
     {
-        label: 'Dennis',
-        username: 'Dennis'
+        label: 58,
+        fullName: 'Dennis',
+        username: 'dennis'
     }
 ]
 

@@ -93,7 +93,9 @@ var h = function h(tag, attrs) {
     return elem[key] = attrs[key];
   });
   children.forEach(function (child) {
-    if (typeof child === "string") child = document.createTextNode(child);
+    if (typeof child === "string") {
+      child = document.createTextNode(child);
+    }
     elem.appendChild(child);
   });
   return elem;
