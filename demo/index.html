@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Quill Paste Handler</title>
+        <title>Quill Mentions</title>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="https://cdn.quilljs.com/1.2.2/quill.snow.css" rel="stylesheet">
@@ -17,53 +17,50 @@
         <!-- <script src="../dist/quill-mentions.js"></script> -->
         <script src="../src/module-mentions.js"></script>
         <script type="text/javascript">
-            var quill = new Quill('#quill-editor', {
+            var quill = new Quill("#quill-editor", {
                 modules:{
                     toolbar: false,
                     mentions: {
                         users: [
                             {
-                                id: 148,
-                                firstName: "YeMin",
-                                fullName: "Yemin Tester",
-                                lastName: "Tester",
-                                picture: "https://boltmedia-test.s3-ap-southeast-1.amazonaws.com/avatar.png/1502936501.1/users/148/images",
-                                role: 1,
-                                username: "yemintester"
+                                id: 123,
+                                fullName: "Ye Min Htut",
+                                username: "yemin"
                             },
                             {
-                                id: 149,
-                                firstName: "Chen",
-                                fullName: "Chen Chang",
-                                lastName: "Chang",
-                                picture: "https://boltmedia-test.s3-ap-southeast-1.amazonaws.com/avatar.png/1502936501.1/users/148/images",
-                                role: 3,
-                                username: "chenchang"
+                                id: 145,
+                                fullName: "Satheesh Kannan",
+                                username: "satheesh"
                             },
                             {
-                                id: 150,
-                                firstName: "Satheesh1",
-                                fullName: "Satheesh1 Kannan",
-                                lastName: "Kannan",
-                                picture: "https://boltmedia-test.s3-ap-southeast-1.amazonaws.com/avatar.png/1502936501.1/users/148/images",
-                                role: 3,
-                                username: "satheesh1"
+                                id: 156,
+                                fullName: "Timothy",
+                                username: "timothy"
+                            },
+                            {
+                                id: 114,
+                                fullName: "Chan Yi Wen",
+                                username: "yiwen"
+                            },                   
+                            {
+                                id: 129,
+                                fullName: "Eileen Chan",
+                                username: "eileen"
                             },
                         ],
-                        mentionOpen: true
                     }
                   },
-                  theme: 'snow'
+                  theme: "snow"
               });
 
-              var quillTwo = new Quill('#quill-editor-two', {
+              var quillTwo = new Quill("#quill-editor-two", {
                   modules:{
                       toolbar: true,
                       mentions: {
                           users: []
                       }
                     },
-                    theme: 'snow'
+                    theme: "snow"
                 });
 
         </script>
