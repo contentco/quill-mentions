@@ -162,7 +162,7 @@ var Mentions = function () {
     if (!this.users || this.users && this.users.length < 1) {
       return;
     }
-    this.quill.root.setAttribute('data-gramm', false);
+    this.quill.root.setAttribute("data-gramm", false);
     this.container = this.quill.container.parentNode.querySelector(props.container);
     this.container = document.createElement("ul");
     this.container.classList.add("completions");
@@ -172,12 +172,12 @@ var Mentions = function () {
     this.onSelectionChange = this.maybeUnfocus.bind(this);
     this.onTextChange = this.update.bind(this);
 
-    this.mentionBtnControl = document.createElement('div');
-    this.mentionBtnControl.classList.add('textarea-mention-control');
+    this.mentionBtnControl = document.createElement("div");
+    this.mentionBtnControl.classList.add("textarea-mention-control");
     this.mentionBtnControl.style.position = "absolute";
     this.mentionBtnControl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 50 50"><path fill="#000" fill-rule="evenodd" d="M24.7 20.92c-1.67 0-2.65 1.33-2.65 3.56 0 2.22.98 3.57 2.62 3.57 1.67 0 2.72-1.36 2.72-3.57 0-2.2-1.06-3.56-2.7-3.56zm.5-9.58c7.47 0 12.6 4.72 12.6 11.6 0 4.98-2.36 8.1-6.14 8.1-1.96 0-3.38-.95-3.72-2.45h-.28c-.66 1.57-1.94 2.38-3.75 2.38-3.24 0-5.4-2.62-5.4-6.6 0-3.8 2.13-6.36 5.25-6.36 1.67 0 3.03.8 3.66 2.2h.3v-1.86h3.14v8.28c0 1.1.55 1.75 1.5 1.75 1.58 0 2.6-2 2.6-5.18 0-5.66-3.9-9.34-9.85-9.34-6.05 0-10.26 4.34-10.26 10.57 0 6.35 4.2 10.35 10.85 10.35 1.66 0 3.36-.2 4.24-.52v2.55c-1.22.36-2.83.56-4.5.56C17.32 37.4 12 32.2 12 24.37c0-7.72 5.4-13.04 13.2-13.04z"/></svg>';
     this.quill.container.appendChild(this.mentionBtnControl);
-    this.mentionBtnControl.addEventListener('click', this.clickMentionBtn.bind(this), false);
+    this.mentionBtnControl.addEventListener("click", this.clickMentionBtn.bind(this), false);
 
     this.open = false;
     this.atIndex = null;
@@ -194,19 +194,19 @@ var Mentions = function () {
       key: 40,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this, 'ArrowDown'));
+    }, this.handleArrow.bind(this, "ArrowDown"));
 
     quill.keyboard.addBinding({
       key: 38,
       collapsed: true,
       format: ["mention"]
-    }, this.handleArrow.bind(this, 'ArrowUp'));
+    }, this.handleArrow.bind(this, "ArrowUp"));
 
     quill.keyboard.addBinding({
       key: 27,
       collapsed: true,
       format: ["mention"]
-    }, this.handleEsc.bind(this, 'ArrowUp'));
+    }, this.handleEsc.bind(this, "ArrowUp"));
 
     quill.keyboard.addBinding({
       key: 13,
@@ -231,7 +231,7 @@ var Mentions = function () {
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
 
       if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
-        this.container.style.left = 'auto';
+        this.container.style.left = "auto";
         this.container.style.right = 0;
       } else {
         this.container.style.left = atSignBounds.left + "px";
@@ -281,7 +281,7 @@ var Mentions = function () {
       this.atIndex = range.index;
 
       if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
-        this.container.style.left = 'auto';
+        this.container.style.left = "auto";
         this.container.style.right = 0;
       } else {
         this.container.style.left = atSignBounds.left + "px";
@@ -347,10 +347,10 @@ var Mentions = function () {
       var users = this.users.filter(function (u) {
         var searchPattern = new RegExp(_this2.query, "gi");
         if (searchPattern.test(u.username)) {
-          u.searchKey = 'username';
+          u.searchKey = "username";
           return u;
         } else if (searchPattern.test(u.fullName)) {
-          u.searchKey = 'name';
+          u.searchKey = "name";
           return u;
         }
       }).sort(function (u1, u2) {
@@ -410,7 +410,7 @@ var Mentions = function () {
         // h("span", {className: "mention--name"}, ' '+ (user.searchKey === 'name' ? (this.query + user.fullName.slice(this.query.length)) : user.fullName))
         ));
         _this3.container.appendChild(li);
-        li.setAttribute('id', user.id);
+        li.setAttribute("id", user.id);
         _this3.list[i].addEventListener("mouseenter", mouseHandler(i, user));
       });
 
@@ -419,7 +419,7 @@ var Mentions = function () {
       }
 
       if (this.currentPosition >= 0 && this.list[this.currentPosition]) {
-        this.list[this.currentPosition].classList.add('active');
+        this.list[this.currentPosition].classList.add("active");
       }
 
       if (!users.length) {
