@@ -1,6 +1,6 @@
 {
   "name": "quill-mentions",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Quill Extension for mentions",
   "main": "webpack.config.js",
   "authors": [
