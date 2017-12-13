@@ -1,7 +1,7 @@
 {
-  "name": "quill-paste-handler",
-  "version": "0.1.0",
-  "description": "Quill Extension for Copy and Paste",
+  "name": "quill-mentions",
+  "version": "0.0.3",
+  "description": "Quill Extension for mentions",
   "main": "webpack.config.js",
   "devDependencies": {
     "babel-core": "^6.24.0",
@@ -21,20 +21,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/contentco/quill-paste-handler.git"
+    "url": "git+https://github.com/contentco/quill-mentions.git"
   },
   "keywords": [
     "content",
-    "emoji",
+    "mentions",
     "quill",
     "editor"
   ],
-  "author": "Ye Min Htut",
+  "author": "contentco.co",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/contentco/quill-paste-handler/issues"
+    "url": "https://github.com/contentco/quill-mentions/issues"
   },
-  "homepage": "https://github.com/contentco/quill-paste-handler#readme",
+  "homepage": "https://github.com/contentco/quill-mentions#readme",
   "dependencies": {
     "babel": "^6.23.0",
     "fuse.js": "^2.6.2",

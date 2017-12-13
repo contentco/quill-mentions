@@ -222,6 +222,11 @@ var Mentions = function () {
     key: "clickMentionBtn",
     value: function clickMentionBtn() {
       var users = this.users;
+      if (!this.open) {
+        this.quill.insertText(this.quill.selection.savedRange.index, "@", "mention", "0", Quill.sources.USER);
+        this.quill.setSelection(this.quill.selection.savedRange.index + 2, 0, Quill.sources.SILENT);
+      }
+
       this.renderMentionBox(users);
     }
   }, {
@@ -239,7 +244,6 @@ var Mentions = function () {
         this.container.style.left = atSignBounds.left + "px";
       }
 
-      //this.container.style.left = atSignBounds.left + "px";
       var windowHeight = window.innerHeight;
       var editorPos = this.quill.container.getBoundingClientRect().top;
 
@@ -384,7 +388,7 @@ var Mentions = function () {
             users.forEach(function (user, i) {
               if (_this3.list[_this3.currentPosition] && _this3.list[_this3.currentPosition].id && user.id == _this3.list[_this3.currentPosition].id) {
                 if (_this3.isBoxRender) {
-                  _this3.mentionBoxClose(user);
+                  _this3.mentionBoxClose(user, event.key === "Enter" || event.keyCode === 13 ? true : false, _this3.quill.getSelection(), event.key === "Tab" || event.keyCode === 9 ? true : false);
                 } else {
                   _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false);
                 }
@@ -464,20 +468,24 @@ var Mentions = function () {
     }
   }, {
     key: "mentionBoxClose",
-    value: function mentionBoxClose(value) {
+    value: function mentionBoxClose(value, isEnter, range, isTab) {
       this.container.scrollTop = 0;
       this.container.style.display = "none";
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
-      }if (value) {
+      }this.quill.off("selection-change", this.onSelectionChange);
+      this.quill.off("text-change", this.onTextChange);
+
+      if (value) {
         var label = value.label,
             username = value.username;
 
-        this.quill.insertText(this.quill.selection.savedRange.index, "@" + username, "mention", label, Quill.sources.USER);
-        this.quill.insertText(this.quill.selection.savedRange.index + username.length + 1, " ", "mention", false, Quill.sources.USER);
-        this.quill.setSelection(this.quill.selection.savedRange.index + username.length + 2, 0, Quill.sources.SILENT);
+        this.quill.insertText(range.index, "@" + username + ' ', 'mention', false, Quill.sources.USER);
+        this.quill.deleteText(range.index - 1, isTab ? 2 : 1);
+        this.quill.setSelection(range.index + username.length + 1, 0, Quill.sources.SILENT);
       }
       this.open = false;
+      this.onClose && this.onClose(value);
     }
   }]);
 
