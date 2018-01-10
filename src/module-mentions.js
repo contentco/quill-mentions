@@ -232,11 +232,10 @@ class Mentions {
     this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
     const users = this.users
       .filter(u => {
-        const searchPattern = new RegExp(this.query, "gi");
-        if (searchPattern.test(u.username)){
+        if (u.username.indexOf(this.query) != -1){
           u.searchKey = "username";
           return u;
-        } else if (searchPattern.test(u.fullName)) {
+        } else if (u.fullName.indexOf(this.query) != -1) {
           u.searchKey = "name";
           return u;
         }

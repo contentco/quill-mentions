@@ -351,11 +351,10 @@ var Mentions = function () {
       }
       this.query = this.quill.getText(this.atIndex + 1, sel - this.atIndex - 1);
       var users = this.users.filter(function (u) {
-        var searchPattern = new RegExp(_this2.query, "gi");
-        if (searchPattern.test(u.username)) {
+        if (u.username.indexOf(_this2.query) != -1) {
           u.searchKey = "username";
           return u;
-        } else if (searchPattern.test(u.fullName)) {
+        } else if (u.fullName.indexOf(_this2.query) != -1) {
           u.searchKey = "name";
           return u;
         }
