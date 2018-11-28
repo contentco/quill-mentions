@@ -271,45 +271,51 @@ var Mentions = function () {
   }, {
     key: "onAtKey",
     value: function onAtKey(range) {
+      var prevText = this.quill.getText(range.index - 1, range.index).trim();
       // if (this.open) return true;
       if (this.open) {
         close(null);
       }
-      this.isBoxRender = false;
 
       if (range.length > 0) {
         this.quill.deleteText(range.index, range.length, Quill.sources.USER);
       }
-      this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
-      var atSignBounds = this.quill.getBounds(range.index);
-      this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
 
-      this.atIndex = range.index;
-
-      if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
-        this.container.style.left = "auto";
-        this.container.style.right = 0;
+      if (prevText) {
+        this.quill.insertText(range.index, "@");
       } else {
-        this.container.style.left = atSignBounds.left + "px";
+        this.isBoxRender = false;
+        this.quill.insertText(range.index, "@", "mention", "0", Quill.sources.USER);
+        var atSignBounds = this.quill.getBounds(range.index);
+        this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+
+        this.atIndex = range.index;
+
+        if (atSignBounds.left + 230 > this.quill.container.offsetWidth) {
+          this.container.style.left = "auto";
+          this.container.style.right = 0;
+        } else {
+          this.container.style.left = atSignBounds.left + "px";
+        }
+
+        var windowHeight = window.innerHeight;
+        var editorPos = this.quill.container.getBoundingClientRect().top;
+
+        if (editorPos > windowHeight / 2) {
+          this.container.style.top = "auto";
+          this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
+        } else {
+          this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
+          this.container.style.bottom = "auto";
+        }
+
+        this.container.style.zIndex = 99;
+        //this.open = true;
+        this.quill.on("text-change", this.onTextChange);
+        this.quill.once("selection-change", this.onSelectionChange);
+        this.update();
+        this.onOpen && this.onOpen();
       }
-
-      var windowHeight = window.innerHeight;
-      var editorPos = this.quill.container.getBoundingClientRect().top;
-
-      if (editorPos > windowHeight / 2) {
-        this.container.style.top = "auto";
-        this.container.style.bottom = atSignBounds.top + atSignBounds.height + 15 + "px";
-      } else {
-        this.container.style.top = atSignBounds.top + atSignBounds.height + 15 + "px";
-        this.container.style.bottom = "auto";
-      }
-
-      this.container.style.zIndex = 99;
-      //this.open = true;
-      this.quill.on("text-change", this.onTextChange);
-      this.quill.once("selection-change", this.onSelectionChange);
-      this.update();
-      this.onOpen && this.onOpen();
     }
   }, {
     key: "handleArrow",
@@ -457,9 +463,15 @@ var Mentions = function () {
         var label = value.label,
             username = value.username;
 
+
+        if (this.quill.root.innerText[this.atIndex - 1] != ' ') {
+          console.log("inserted");
+          this.quill.insertText(this.atIndex - 1, " ", "mention", false, Quill.sources.USER);
+        }
+
         this.quill.deleteText(this.atIndex, isEnter ? this.query.length + 2 : this.query.length + 1, Quill.sources.USER);
         this.quill.insertText(this.atIndex, "@" + username, "mention", label, Quill.sources.USER);
-        this.quill.insertText(this.atIndex + username.length + 1, " ", "mention", false, Quill.sources.USER);
+        // this.quill.insertText(this.atIndex + username.length + 1, " ", "mention", false, Quill.sources.USER);
         this.quill.setSelection(this.atIndex + username.length + 2, 0, Quill.sources.SILENT);
       }
       this.open = false;
