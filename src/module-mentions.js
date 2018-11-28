@@ -11,6 +11,7 @@ const h = (tag, attrs, ...children) => {
 };
 
 const Inline = Quill.import("blots/inline");
+
 class MentionBlot extends Inline {
   static create(label) {
     const node = super.create();
@@ -361,4 +362,5 @@ class Mentions {
     this.onClose && this.onClose(value);
   }
 }
+
 Quill.register("modules/mentions", Mentions);
