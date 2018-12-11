@@ -223,8 +223,8 @@ var Mentions = function () {
     value: function clickMentionBtn() {
       var users = this.users;
       if (!this.open) {
-        this.quill.insertText(this.quill.selection.savedRange.index, "@", "mention", "0", Quill.sources.USER);
-        this.quill.setSelection(this.quill.selection.savedRange.index + 2, 0, Quill.sources.SILENT);
+        this.quill.insertText(this.quill.selection.savedRange.index, "@", "", "0", Quill.sources.USER);
+        this.quill.setSelection(this.quill.selection.savedRange.index + 1, 0, Quill.sources.SILENT);
       }
 
       this.renderMentionBox(users);
@@ -233,6 +233,7 @@ var Mentions = function () {
     key: "renderMentionBox",
     value: function renderMentionBox(users) {
       this.open = !this.open;
+      console.log("render");
 
       this.isBoxRender = true;
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
@@ -271,7 +272,8 @@ var Mentions = function () {
   }, {
     key: "onAtKey",
     value: function onAtKey(range) {
-      var prevText = this.quill.getText(range.index - 1, range.index).trim();
+      var prevText = this.quill.getText(range.index - 1, 1).trim();
+      var nextText = this.quill.getText(range.index, 1).trim();
       // if (this.open) return true;
       if (this.open) {
         close(null);
@@ -281,7 +283,7 @@ var Mentions = function () {
         this.quill.deleteText(range.index, range.length, Quill.sources.USER);
       }
 
-      if (prevText) {
+      if (prevText || nextText) {
         this.quill.insertText(range.index, "@");
       } else {
         this.isBoxRender = false;
@@ -395,7 +397,7 @@ var Mentions = function () {
                 if (_this3.isBoxRender) {
                   _this3.mentionBoxClose(user, event.key === "Enter" || event.keyCode === 13 ? true : false, _this3.quill.getSelection(), event.key === "Tab" || event.keyCode === 9 ? true : false);
                 } else {
-                  _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false);
+                  _this3.close(user, event.key === "Enter" || event.keyCode === 13 ? true : false, event.key === "Tab" || event.keyCode === 9 ? true : false);
                 }
               }
             });
@@ -451,7 +453,7 @@ var Mentions = function () {
     }
   }, {
     key: "close",
-    value: function close(value, isEnter) {
+    value: function close(value, isEnter, isTab) {
       this.container.scrollTop = 0;
       this.container.style.display = "none";
       while (this.container.firstChild) {
@@ -464,15 +466,14 @@ var Mentions = function () {
             username = value.username;
 
 
-        if (this.quill.root.innerText[this.atIndex - 1] != ' ') {
-          console.log("inserted");
-          this.quill.insertText(this.atIndex - 1, " ", "mention", false, Quill.sources.USER);
-        }
-
-        this.quill.deleteText(this.atIndex, isEnter ? this.query.length + 2 : this.query.length + 1, Quill.sources.USER);
+        this.quill.deleteText(this.atIndex, this.query.length + 1, Quill.sources.USER);
         this.quill.insertText(this.atIndex, "@" + username, "mention", label, Quill.sources.USER);
         // this.quill.insertText(this.atIndex + username.length + 1, " ", "mention", false, Quill.sources.USER);
-        this.quill.setSelection(this.atIndex + username.length + 2, 0, Quill.sources.SILENT);
+        this.quill.setSelection(this.atIndex + username.length + 1, 0, Quill.sources.SILENT);
+
+        if (isTab) {
+          this.quill.deleteText(this.atIndex + username.length + 1, 1, Quill.sources.USER);
+        }
       }
       this.open = false;
       this.onClose && this.onClose(value);
@@ -491,10 +492,17 @@ var Mentions = function () {
         var label = value.label,
             username = value.username;
 
-        this.quill.insertText(range.index, "@" + username + ' ', 'mention', false, Quill.sources.USER);
-        this.quill.deleteText(range.index - 1, isTab ? 2 : 1);
+        // this.quill.deleteText(range.index, 1, Quill.sources.USER);
+
+        this.quill.insertText(range.index, username + ' ', "mention", label, Quill.sources.USER);
+        // this.quill.insertText(range.index + username.length + 1, " ", "mention", false, Quill.sources.USER);
         this.quill.setSelection(range.index + username.length + 1, 0, Quill.sources.SILENT);
+
+        if (isTab) {
+          this.quill.deleteText(range.index - 1, 1, Quill.sources.USER);
+        }
       }
+
       this.open = false;
       this.onClose && this.onClose(value);
     }
