@@ -120,6 +120,11 @@ class Mentions {
   renderMentionBox(users) {
     this.open = !this.open;
 
+    if (!this.open) {
+      this.quill.deleteText(this.quill.selection.savedRange.index-1, 1, Quill.sources.USER);
+      this.quill.setSelection(this.quill.selection.savedRange.index-1, 0, Quill.sources.SILENT);
+    }
+
     this.isBoxRender = true;
     let atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
 

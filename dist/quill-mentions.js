@@ -233,7 +233,11 @@ var Mentions = function () {
     key: "renderMentionBox",
     value: function renderMentionBox(users) {
       this.open = !this.open;
-      console.log("render");
+
+      if (!this.open) {
+        this.quill.deleteText(this.quill.selection.savedRange.index - 1, 1, Quill.sources.USER);
+        this.quill.setSelection(this.quill.selection.savedRange.index - 1, 0, Quill.sources.SILENT);
+      }
 
       this.isBoxRender = true;
       var atSignBounds = this.quill.getBounds(this.quill.selection.savedRange.index);
